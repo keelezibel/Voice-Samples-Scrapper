@@ -1,0 +1,17 @@
+python-dotenv==0.21.0
+pandas==1.4.4
+beautifulsoup4==4.11.1
+lxml
+scrapetube==2.3.0
+wget 
+unidecode 
+tqdm 
+yt-dlp
+speechbrain==0.5.13
+torchtext==0.13.0
+pydub
+tensorflow==2.8
+tensorboard
+dlib
+opencv-contrib-python==4.5.5.64
+deepface
