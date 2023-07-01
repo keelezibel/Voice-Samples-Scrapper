@@ -1,13 +1,14 @@
-version: "3.3"
+version: "3.7"
 
 services:
   app:
-    image: nemo:1.0.0
+    image: keelezibel/diarization-pyannote:1.0.0
     volumes:
+      - ./models:/models
       - ./data:/app/data
+      - ./outputs:/app/outputs
       - ./src:/app/src
-      - ./models:/app/models
-      - ./.env:/app/.env
+      - .env:/app/.env
     tty: true
     deploy:
       resources:
@@ -18,4 +19,5 @@ services:
               capabilities: [ gpu ]
     environment:
       - DEEPFACE_HOME=/app/models
+      - PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
     shm_size: '8gb'
