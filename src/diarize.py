@@ -103,7 +103,7 @@ class Diarization:
         ref = glob(ref_path)[0]
         ref_face = os.path.join(
             os.getenv("REF_IMAGES_DIR"),
-            f"{name}.jpg",
+            f"{name}.{os.getenv("DEFAULT_REF_IMAGE_FORMAT")}",
         )
 
         tmpfolder = os.getenv("TMP_FOLDER")
@@ -135,7 +135,7 @@ class Diarization:
                     # Speaker Verification
                     score, voice_prediction = self.compare_speaker(ref, tmpfile)
                     # Face Verification
-                    tmpfile_img = f"{tmpfolder}/{name}_{turn.start}_{turn.end}.jpg"
+                    tmpfile_img = f"{tmpfolder}/{name}_{turn.start}_{turn.end}.{os.getenv("DEFAULT_REF_IMAGE_FORMAT")}"
                     timestamp = datetime.timedelta(seconds=(turn.end + turn.start) / 2)
 
                     self.extract_frame(orig_video_file, tmpfile_img, timestamp)
