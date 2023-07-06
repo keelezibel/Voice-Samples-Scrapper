@@ -165,7 +165,8 @@ data/poi_list/*
 data/ref_audio/*
 data/ref_images/*
 !data/**/.keep
-models/*
+models/**/*
+!models/.keep
 src/visualization/.ipynb_checkpoints
 src/visualization/runs
 .env.local

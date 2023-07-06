@@ -1,32 +1,44 @@
-# How to use this repo
+# Purpose of this repository
 
-### Step 1: Prepare POI CSV put into `data/poi_list/poi_list.csv`
+Isn't it a pain to collect audio data of specific speakers for enrollment? Look no further, this repo will help you collect audio samples for your list of interested speakers.
+
+Libraries:
+- Pyannote (for diarization)
+- DeepFace (for face recognition)
+- SpeechBrain (for speaker recognition)
+
+
+### Step 0: Download [models](https://drive.google.com/file/d/1Nipli4nTcdCjQz2tblI-bQ25b3xHdOs6/view?usp=sharing) and copy to `models`
+
+### Step 1: `docker-compose up -d`
+
+### Step 2: Prepare POI CSV put into `data/poi_list/poi_list.csv`
 ```
 <POI Name 1>
 <POI Name 2>
 ```
 
-### Step 2: Get Video Links for each URL (Based on YT)
+### Step 3: Get Video Links for each URL (Based on YT)
 ```python
 python src/video_link_scrapper.py --file poi_list.csv
 ```
 
-### Step 3: Get Video for each URL (Based on YT)
+### Step 4: Get Video for each URL (Based on YT)
 ```python
 python src/video_scrapper.py --file poi_list_withurls.csv
 ```
 
-### Step 4: Prepare reference audio CSV put into `data/ref_audio/ref_audio.csv`
+### Step 5: Prepare reference audio CSV put into `data/ref_audio/ref_audio.csv`
 ```python
 python src/download_ref_segments.py
 ```
 
-### Step 5: Prepare reference image and put into `data/ref_images/*`
+### Step 6: Prepare reference image and put into `data/ref_images/*`
 - All images name must match the names in `data/poi_list/poi_list.csv`
 - Make sure all images are the same format (e.g. jpg, png etc.) and update `DEFAULT_REF_IMAGE_FORMAT` in `.env` file.
 
 
-### Step 6: Diarize
+### Step 7: Diarize
 ```python
 python src/diarize.py --file poi_list.csv
 ```
@@ -34,7 +46,7 @@ python src/diarize.py --file poi_list.csv
 ## Repo Structure
 
 ```
-📦POI Scrapper
+📦Voice Scrapper
     📦data
     ┣ 📂diarization
     ┣ 📂poi_list
