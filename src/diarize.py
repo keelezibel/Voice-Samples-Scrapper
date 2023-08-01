@@ -90,7 +90,7 @@ class Diarization:
     def diarize(self, name):
         # apply the pipeline to an audio file
         # diarization = self.pipeline(
-        #     os.path.join(self.video_folder, "Mr George Goh Ching Wah/5Zb-xx-MD7w.wav")
+        #     os.path.join(self.video_folder, "sample.wav")
         # )
         video_path = os.path.join(os.getenv("DATA_FOLDER"), os.getenv("VIDEO_FOLDER"))
         poi_video_path = f"{os.path.join(video_path, name)}/*.wav"
