@@ -62,6 +62,7 @@ class RefVideoScrapper:
         """
         ydl_opts = {
             "format": "m4a/bestaudio/best",
+            # "format": "mp4",
             "download_ranges": download_range_func([], [(start, end)]),
             "postprocessors": [
                 {  # Extract audio using ffmpeg
@@ -69,7 +70,7 @@ class RefVideoScrapper:
                     "preferredcodec": "wav",
                 }
             ],
-            "outtmpl": f"{self.audio_dir}/{name}/%(id)s.%(ext)s",
+            "outtmpl": f"{self.audio_dir}/{name}/%(id)s_{start}_{end}.%(ext)s",
             "logger": YTLogger,
         }
 

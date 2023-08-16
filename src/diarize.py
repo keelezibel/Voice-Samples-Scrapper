@@ -38,6 +38,7 @@ class Diarization:
         self.spkr_embed_model = None
         self.audio_reader = None
         self.pipeline = None
+        self.export_video = os.getenv("EXPORT_VIDEO_FLAG")
         self.diarization_folder = os.path.join(
             os.getenv("DATA_FOLDER"), os.getenv("DIARIZATION_FOLDER")
         )
@@ -85,13 +86,15 @@ class Diarization:
         stream = ffmpeg.input(in_filename, ss=timestamp)
         stream = stream.output(out_filename, frames=1)
         stream.compile()
-        stream.run(overwrite_output=True)
+        stream.run(overwrite_output=True, quiet=True)
+
+    def extract_video_segment(self, in_filename, out_filename, start_timestamp, end_timestamp):
+        stream = ffmpeg.input(in_filename, ss=start_timestamp, to=end_timestamp)
+        stream = stream.output(out_filename)
+        stream.compile()
+        stream.run(overwrite_output=True, quiet=True)
 
     def diarize(self, name):
-        # apply the pipeline to an audio file
-        # diarization = self.pipeline(
-        #     os.path.join(self.video_folder, "Mr George Goh Ching Wah/5Zb-xx-MD7w.wav")
-        # )
         video_path = os.path.join(os.getenv("DATA_FOLDER"), os.getenv("VIDEO_FOLDER"))
         poi_video_path = f"{os.path.join(video_path, name)}/*.wav"
         wav_files = glob(poi_video_path)
@@ -101,9 +104,10 @@ class Diarization:
             f"{name}/*.wav",
         )
         ref = glob(ref_path)[0]
+        ref_image_format = os.getenv("DEFAULT_REF_IMAGE_FORMAT")
         ref_face = os.path.join(
             os.getenv("REF_IMAGES_DIR"),
-            f"{name}.{os.getenv("DEFAULT_REF_IMAGE_FORMAT")}",
+            f"{name}.{ref_image_format}",
         )
 
         tmpfolder = os.getenv("TMP_FOLDER")
@@ -135,7 +139,8 @@ class Diarization:
                     # Speaker Verification
                     score, voice_prediction = self.compare_speaker(ref, tmpfile)
                     # Face Verification
-                    tmpfile_img = f"{tmpfolder}/{name}_{turn.start}_{turn.end}.{os.getenv("DEFAULT_REF_IMAGE_FORMAT")}"
+                    ref_image_format = os.getenv("DEFAULT_REF_IMAGE_FORMAT")
+                    tmpfile_img = f"{tmpfolder}/{name}_{turn.start}_{turn.end}.{ref_image_format}"
                     timestamp = datetime.timedelta(seconds=(turn.end + turn.start) / 2)
 
                     self.extract_frame(orig_video_file, tmpfile_img, timestamp)
@@ -144,13 +149,14 @@ class Diarization:
                         face_prediction = self.verify_face(
                             ref_face,
                             tmpfile_img,
-                            model_name="Facenet512",
-                            distance_metric="euclidean_l2",
-                            detector_backend="dlib",
+                            model_name="Facenet",
+                            distance_metric="cosine",
+                            detector_backend="mtcnn"
                         )
                     except Exception as e:
                         face_prediction = False
 
+                    print(f"{str(datetime.timedelta(seconds=turn.start))} - {str(datetime.timedelta(seconds=turn.end))}, VoiceScore: {score}, Face: {face_prediction}")
                     if (
                         score >= float(os.getenv("VOICE_THRESHOLD"))
                         and voice_prediction
@@ -164,8 +170,16 @@ class Diarization:
                             for i, chunk in enumerate(chunks):
                                 chunk_name = f"{self.diarization_folder}/{name}/{wav_name_no_ext}_{turn.start}_{turn.end}_{i}.wav"
                                 chunk.export(chunk_name, format="wav")
+                                # Export video segment as well
+                                if self.export_video == "true":
+                                    out_filename = f"{self.diarization_folder}/{name}/{wav_name_no_ext}_{turn.start}_{turn.end}_{i}.mp4"
+                                    self.extract_video_segment(orig_video_file, out_filename, turn.start, turn.end)
                             os.remove(tmpfile)
                         else:
+                            # Export video segment as well
+                            if self.export_video == "true":
+                                out_filename = f"{self.diarization_folder}/{name}/{wav_name_no_ext}_{turn.start}_{turn.end}.mp4"
+                                self.extract_video_segment(orig_video_file, out_filename, turn.start, turn.end)
                             shutil.move(tmpfile, outfile)
                     else:
                         os.remove(tmpfile)
