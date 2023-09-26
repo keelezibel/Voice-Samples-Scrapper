@@ -14,6 +14,7 @@ Libraries:
 
 ### Step 2: Prepare POI CSV put into `data/poi_list/poi_list.csv`
 ```
+Name
 <POI Name 1>
 <POI Name 2>
 ```
@@ -23,25 +24,43 @@ Libraries:
 python src/video_link_scrapper.py --file poi_list.csv
 ```
 
+This step will produce another file appended with `_withurls.csv`
+| Name | Urls                      |
+| ---- | ------------------------- |
+| Name | ['https://www.youtube.com/watch?v=id', 'https://www.youtube.com/watch?v=id'...] |
+
+
 ### Step 4: Get Video for each URL (Based on YT)
 ```python
 python src/video_scrapper.py --file poi_list_withurls.csv
 ```
+After running the command above, `data/original_video` folder will store the videos for each person.
 
 ### Step 5: Prepare reference audio CSV put into `data/ref_audio/ref_audio.csv`
+
+| Name | Urls                               | start | end |
+| ---- | ---------------------------------- | ----- | --- |
+| Name | https://www.youtube.com/watch?v=id | 35    | 50  |
+
 ```python
 python src/download_ref_segments.py
 ```
 
+After running the command above, `data/ref_audio` will have individual folder for each person and their corresponding `.wav` file.
+
 ### Step 6: Prepare reference image and put into `data/ref_images/*`
 - All images name must match the names in `data/poi_list/poi_list.csv`
 - Make sure all images are the same format (e.g. jpg, png etc.) and update `DEFAULT_REF_IMAGE_FORMAT` in `.env` file.
+
+The output for this step is a bunch of image files in `data/ref_images` folder.
 
 
 ### Step 7: Diarize
 ```python
 python src/diarize.py --file poi_list.csv
 ```
+
+The output for this step is the `data/diarization` folder storing all the audio files for individual speakers.
 
 ## Repo Structure
 
